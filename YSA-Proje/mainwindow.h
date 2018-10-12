@@ -23,6 +23,7 @@ public:
     void setSelectedClass(const QString &value);
 private slots:
     void on_classSelectComboBox_currentTextChanged(const QString &arg1);
+    void on_pushButtonTrain_clicked();
 
 public slots:
     void mousePressEvent(QMouseEvent * e) override;

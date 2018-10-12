@@ -27,11 +27,15 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    myqgraphicsview.cpp
+    myqgraphicsview.cpp \
+    matrix.cpp \
+    vertex.cpp
 
 HEADERS += \
         mainwindow.h \
-    myqgraphicsview.h
+    myqgraphicsview.h \
+    matrix.h \
+    vertex.h
 
 FORMS += \
         mainwindow.ui
