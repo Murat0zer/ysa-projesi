@@ -14,6 +14,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
@@ -21,14 +22,14 @@ public:
     QList<QString> getClassNames();
     QString getSelectedClass();
     void setSelectedClass(const QString &value);
+
 private slots:
     void on_classSelectComboBox_currentTextChanged(const QString &arg1);
     void on_pushButtonTrain_clicked();
-
-public slots:
-    void mousePressEvent(QMouseEvent * e) override;
+    void on_pushButtonClear_clicked();
 
 private:
+
     Ui::MainWindow *ui;
     QString selectedClass;
     QList<QString> classList;

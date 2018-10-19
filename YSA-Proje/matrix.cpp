@@ -84,7 +84,6 @@ Matrix Matrix::matrisTranspoze(Matrix matris)
     for(int i=1; i<=matris.getColumn(); i++)
         for (int j = 1; j <= matris.getRow(); j++)
         {
-            double a = matris.Get(j, i);
             transpozeMatris.Set(i, j, matris.Get(j, i));
         }
 

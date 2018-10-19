@@ -6,16 +6,20 @@
 #include <QGraphicsEllipseItem>
 #include <QGraphicsLineItem>
 #include <QMouseEvent>
+#include <QPointF>
+#include <QRandomGenerator>
 #include "ui_mainwindow.h"
 #include "vertex.h"
 #include "matrix.h"
+
+static double PIXEL_TO_CM = 37.795276;
 
 class MyQGraphicsView : public QGraphicsView
 {
     Q_OBJECT
     public:
         explicit MyQGraphicsView(QWidget *parent = nullptr, Ui::MainWindow *ui = nullptr);
-
+        ~MyQGraphicsView() override;
         QString getSelectedClass() const;
         void setSelectedClass(const QString &value);
 
@@ -38,9 +42,15 @@ class MyQGraphicsView : public QGraphicsView
         Matrix *getWeights() const;
         void setWeights(Matrix *value);
 
+        void clearLines();
+        void clearPoints();
+
+
 private:
         void generateColors();
-        void clearScene();
+        void drawOrigin();
+        void drawRandomLine();
+
 
 signals:
 
@@ -60,6 +70,12 @@ private:
             QMap<QString, QColor> classColors;
             Matrix *weights;
             QGraphicsEllipseItem *ellipse;
+
+            QGraphicsLineItem *qGraphicsLineItem1;
+            QGraphicsLineItem *qGraphicsLineItem2;
+            QLineF *line1;
+            QLineF *line2;
+
 };
 
 #endif // MYQGRAPHICSVIEW_H
