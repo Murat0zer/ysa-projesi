@@ -1,5 +1,7 @@
 #include "myqgraphicsview.h"
 
+static double PIXEL_TO_CM = 37.795276;
+
 MyQGraphicsView::MyQGraphicsView(QWidget *parent, Ui::MainWindow *ui) :
     QGraphicsView(parent)
 {
@@ -15,37 +17,56 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent, Ui::MainWindow *ui) :
 
 void MyQGraphicsView::drawLine(Matrix weights)
 {
-    weights.Set(3,1, weights.Get(3,1));
-    weights.Set(2,1, weights.Get(2,1));
-    weights.Set(1,1, weights.Get(1,1));
-
-    double newZ = weights.Get(3,1);
+//    weights.Set(3,1, weights.Get(3,1));
+//    weights.Set(2,1, weights.Get(2,1));
+//    weights.Set(1,1, weights.Get(1,1));
+    double newZ;
+    if(this->activationFunc == "Binary Function")
+         newZ = weights.Get(3,1);
+    else
+        newZ = weights.Get(3,1) * PIXEL_TO_CM;
     double x2 =  -newZ / weights.Get(2,1);
     double x1 =  -newZ / weights.Get(1,1);
 
-    line1 = new QLineF(450,  225 - x2, x1 + 450  , 225);
-    qGraphicsLineItem1 = new QGraphicsLineItem(*line1);
-    line1->setLength(this->sceneHeight * 2);
-    qGraphicsLineItem1->setPen( QPen(Qt::black, 1, Qt::SolidLine));
-    qGraphicsLineItem1->setLine(*line1);
-    scene->addItem(qGraphicsLineItem1);
+    QLineF *line1 = new QLineF(450,  225 - x2, x1 + 450  , 225);
+    QGraphicsLineItem *qGraphicsLineItem1 = new QGraphicsLineItem(*line1);
 
-    line2 = new QLineF(450,  225 - x2, x1 + 450  , 225);
-    qGraphicsLineItem2 = new QGraphicsLineItem(*line2);
-    line2->setLength(- this->sceneHeight * 2);
-    qGraphicsLineItem2->setPen( QPen(Qt::black, 1, Qt::SolidLine));
-    qGraphicsLineItem2->setLine(*line2);
-    scene->addItem(qGraphicsLineItem2);
+    QLineF *line2 = new QLineF(*line1);
+    QGraphicsLineItem *qGraphicsLineItem2 = new QGraphicsLineItem(*line1);
+
+    ClassLine myLine(line1, qGraphicsLineItem1, line2, qGraphicsLineItem2);
+
+    allLines.append(myLine);
+
+    myLine.getLine1()->setLength(this->sceneHeight * 20000000);
+    myLine.getQGraphicsLineItem1()->setPen( QPen(Qt::black, 1, Qt::SolidLine));
+    myLine.getQGraphicsLineItem1()->setLine(*line1);
+    scene->addItem(myLine.getQGraphicsLineItem1());
+
+
+    myLine.getLine2()->setLength(-this->sceneHeight * 2000000);
+    myLine.getQGraphicsLineItem2()->setPen( QPen(Qt::black, 1, Qt::SolidLine));
+    myLine.getQGraphicsLineItem2()->setLine(*line2);
+    scene->addItem(myLine.getQGraphicsLineItem2());
+
+
 
 }
 
 void MyQGraphicsView::clearLines() {
-    scene->removeItem(qGraphicsLineItem1);
-    scene->removeItem(qGraphicsLineItem2);
+
+    for(ClassLine classLine : allLines) {
+        scene->removeItem(classLine.getQGraphicsLineItem1());
+        scene->removeItem(classLine.getQGraphicsLineItem2());
+        allLines.removeAll(classLine);
+    }
+
+
 }
 
 void MyQGraphicsView::clearPoints()
 {
+    clearLines();
     scene->clear();
     QGraphicsView::viewport()->update();
 
@@ -80,6 +101,26 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
     this->classPoints.insert(this->selectedClass, pointList);
 }
 
+QString MyQGraphicsView::getActivationFunc() const
+{
+    return activationFunc;
+}
+
+void MyQGraphicsView::setActivationFunc(const QString &value)
+{
+    activationFunc = value;
+}
+
+QMap<QString, ClassLine> MyQGraphicsView::getMyLines()
+{
+    return disctrimantFuns;
+}
+
+void MyQGraphicsView::setMyLines(QMap<QString, ClassLine> &value)
+{
+    disctrimantFuns = value;
+}
+
 void MyQGraphicsView::generateColors()
 {
     QColor colours[10] = {QColor("red"), QColor("blue"), QColor("green"), QColor("cyan"),
@@ -106,8 +147,8 @@ void MyQGraphicsView::drawOrigin()
 void MyQGraphicsView::drawRandomLine()
 {
     weights = new Matrix(3,1);
-    weights->Set(1, 1, QRandomGenerator::global()->generateDouble());
-    weights->Set(2, 1, QRandomGenerator::global()->generateDouble());
+    weights->Set(1, 1, QRandomGenerator::global()->generateDouble() );
+    weights->Set(2, 1, QRandomGenerator::global()->generateDouble() );
     weights->Set(3, 1, 3);
 
     this->drawLine(*weights);
@@ -119,12 +160,6 @@ MyQGraphicsView::~MyQGraphicsView()
 
     delete itemToDraw;
     delete ellipse;
-
-    delete qGraphicsLineItem1;
-    delete qGraphicsLineItem2;
-    delete line1;
-    delete line2;
-
 }
 
 // getters setters

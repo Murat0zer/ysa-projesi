@@ -29,13 +29,15 @@ SOURCES += \
         mainwindow.cpp \
     myqgraphicsview.cpp \
     matrix.cpp \
-    vertex.cpp
+    vertex.cpp \
+    classline.cpp
 
 HEADERS += \
         mainwindow.h \
     myqgraphicsview.h \
     matrix.h \
-    vertex.h
+    vertex.h \
+    classline.h
 
 FORMS += \
         mainwindow.ui

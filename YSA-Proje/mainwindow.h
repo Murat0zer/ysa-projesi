@@ -5,6 +5,7 @@
 #include <QGridLayout>
 #include <QRect>
 #include "myqgraphicsview.h"
+#include <QtMath>
 
 namespace Ui {
 class MainWindow;
@@ -28,12 +29,17 @@ private slots:
     void on_pushButtonTrain_clicked();
     void on_pushButtonClear_clicked();
 
+    void on_activationFuncSelectComboBox_currentTextChanged(const QString &arg1);
+
 private:
 
     Ui::MainWindow *ui;
     QString selectedClass;
     QList<QString> classList;
     MyQGraphicsView * myQGraphicsView;
+    QString activationFunc;
+
+    QMap<QString, double> diList;
 
 };
 

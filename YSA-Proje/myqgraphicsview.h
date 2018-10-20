@@ -11,8 +11,7 @@
 #include "ui_mainwindow.h"
 #include "vertex.h"
 #include "matrix.h"
-
-static double PIXEL_TO_CM = 37.795276;
+#include "classline.h"
 
 class MyQGraphicsView : public QGraphicsView
 {
@@ -20,6 +19,9 @@ class MyQGraphicsView : public QGraphicsView
     public:
         explicit MyQGraphicsView(QWidget *parent = nullptr, Ui::MainWindow *ui = nullptr);
         ~MyQGraphicsView() override;
+
+        void drawRandomLine();
+
         QString getSelectedClass() const;
         void setSelectedClass(const QString &value);
 
@@ -46,10 +48,17 @@ class MyQGraphicsView : public QGraphicsView
         void clearPoints();
 
 
+        QMap<QString, ClassLine> getMyLines();
+        void setMyLines(QMap<QString, ClassLine> &value);
+
+
+        QString getActivationFunc() const;
+        void setActivationFunc(const QString &value);
+
 private:
         void generateColors();
         void drawOrigin();
-        void drawRandomLine();
+
 
 
 signals:
@@ -70,11 +79,9 @@ private:
             QMap<QString, QColor> classColors;
             Matrix *weights;
             QGraphicsEllipseItem *ellipse;
-
-            QGraphicsLineItem *qGraphicsLineItem1;
-            QGraphicsLineItem *qGraphicsLineItem2;
-            QLineF *line1;
-            QLineF *line2;
+            QMap<QString, ClassLine> disctrimantFuns;
+            QList<ClassLine> allLines;
+            QString activationFunc;
 
 };
 
