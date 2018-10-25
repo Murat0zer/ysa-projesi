@@ -13,12 +13,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QList<QString> classList;
     int i = 1; double a = 1.0;
     while (true) {
-         if(ui->classSelectComboBox->itemText(i) != "") {
+        if(ui->classSelectComboBox->itemText(i) != "") {
             classList.append(ui->classSelectComboBox->itemText(i));
             diList.insert(ui->classSelectComboBox->itemText(i++), a);
             a = -a;
-         } else
-             break;
+        } else
+            break;
     }
     myQGraphicsView = new MyQGraphicsView(nullptr, ui);
     ui->gridLayout->addWidget(myQGraphicsView);
@@ -35,13 +35,25 @@ void delay(int ms)
 
 void MainWindow::on_pushButtonTrain_clicked()
 {
+    if(activationFunc == "Binary Function")
+        ui->labelCycleResultBinary->setText("0");
+    else
+        ui->labelCycleResultSigmoid->setText("0");
+    Matrix *weightsBeginning = (myQGraphicsView->getWeights());
+    Matrix weights(3, 1);
+    weights.Set(1,1, weightsBeginning->Get(1,1));
+    weights.Set(2,1, weightsBeginning->Get(2,1));
+    weights.Set(3,1, weightsBeginning->Get(3,1));
+    myQGraphicsView->clearLines();
+    myQGraphicsView->drawLine(weights);
+    delay(500);
+
     bool needTraining = true;
     int cycle = 0;
     double netValue;
-    delay(500);
-    Matrix *weights = (myQGraphicsView->getWeights());
     double c = ui->lineEditC->text().toDouble();
     double lambda = ui->lineEditLambda->text().toDouble();
+    double maxErrForSigmoid = ui->lineEditErorForSigmoid->text().toDouble();
     Matrix delta(3, 1);
     Matrix netMatrix(1, 1);
     Matrix transpozeW(1, 3);
@@ -54,16 +66,10 @@ void MainWindow::on_pushButtonTrain_clicked()
         for(QString className : myQGraphicsView->getClassList()) {
             QList<QPointF> points = myQGraphicsView->getClassPoints().value(className);
             for(QPointF point : points) {
-                 if(activationFunc == "Binary Function"){
-                    xn.Set(1, 1, point.x()); xn.Set(2, 1, point.y()); xn.Set(3, 1, 1);
-                 }
-                 else {
-                    xn.Set(1, 1, point.x()/PIXEL_TO_CM);
-                    xn.Set(2, 1, point.y()/PIXEL_TO_CM);
-                    xn.Set(3, 1, 1);
-                 }
 
-                transpozeW = Matrix::matrisTranspoze(*weights);
+                xn.Set(1, 1, point.x()); xn.Set(2, 1, point.y()); xn.Set(3, 1, 1);
+
+                transpozeW = Matrix::matrisTranspoze(weights);
                 netMatrix = Matrix::matrixMultiplication(transpozeW, xn);
                 netValue = netMatrix.Get(1, 1);
 
@@ -73,7 +79,7 @@ void MainWindow::on_pushButtonTrain_clicked()
 
                     if(std::abs(t1) > 0) {
                         delta = xn * t1;
-                        *weights = *weights + delta;
+                        weights = weights + delta;
                         error += std::abs(t1) / 2.00;
                     }
                 } else {
@@ -82,7 +88,7 @@ void MainWindow::on_pushButtonTrain_clicked()
 
                     double var = c * (diList.value(className)- outPut) * deriativeFNet;
                     delta = xn * var;
-                    *weights = *weights + (delta );
+                    weights = weights + (delta );
                     double errorN = qPow(diList.value(className) - outPut, 2.0) / 2.0;
                     error += errorN  ;
                 }
@@ -91,13 +97,13 @@ void MainWindow::on_pushButtonTrain_clicked()
         if(activationFunc == "Binary Function") {
             needTraining = error > 0.0 ? true : false;
         } else
-            needTraining = error > 0.1 ? true : false;
+            needTraining = error > maxErrForSigmoid ? true : false;
 
-        needTraining = cycle > 100000 ? false : needTraining;
+        needTraining = cycle > 10000 ? false : needTraining;
         cycle++;
 
         myQGraphicsView->clearLines();
-        myQGraphicsView->drawLine(*weights);
+        myQGraphicsView->drawLine(weights);
         if(activationFunc == "Binary Function")
             ui->labelCycleResultBinary->setText(QString::number(cycle));
         else
@@ -109,7 +115,7 @@ void MainWindow::on_pushButtonTrain_clicked()
         Matrix *weightsx = (myQGraphicsView->getWeights());
         myQGraphicsView->drawLine(*weightsx);
     } else
-        myQGraphicsView->drawLine(*weights);
+        myQGraphicsView->drawLine(weights);
 }
 
 void MainWindow::on_pushButtonClear_clicked()

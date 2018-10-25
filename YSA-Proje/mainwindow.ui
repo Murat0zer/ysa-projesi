@@ -131,7 +131,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>5</string>
+     <string>50</string>
     </property>
    </widget>
    <widget class="QLabel" name="labelDelay">
@@ -261,6 +261,32 @@
     </property>
     <property name="text">
      <string>l</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>950</x>
+      <y>360</y>
+      <width>151</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Max Error for Sigmoid</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditErorForSigmoid">
+    <property name="geometry">
+     <rect>
+      <x>950</x>
+      <y>390</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0.01</string>
     </property>
    </widget>
   </widget>

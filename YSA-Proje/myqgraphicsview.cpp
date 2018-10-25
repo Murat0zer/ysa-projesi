@@ -21,12 +21,13 @@ void MyQGraphicsView::drawLine(Matrix weights)
 //    weights.Set(2,1, weights.Get(2,1));
 //    weights.Set(1,1, weights.Get(1,1));
     double newZ;
-    if(this->activationFunc == "Binary Function")
-         newZ = weights.Get(3,1);
-    else
-        newZ = weights.Get(3,1) * PIXEL_TO_CM;
-    double x2 =  -newZ / weights.Get(2,1);
-    double x1 =  -newZ / weights.Get(1,1);
+    newZ = weights.Get(3,1);
+//    if(this->activationFunc == "Binary Function")
+//         newZ = weights.Get(3,1);
+//    else
+//        newZ = weights.Get(3,1) * PIXEL_TO_CM;
+    double x2 =  -newZ / weights.Get(2,1) * PIXEL_TO_CM;
+    double x1 =  -newZ / weights.Get(1,1) * PIXEL_TO_CM;
 
     QLineF *line1 = new QLineF(450,  225 - x2, x1 + 450  , 225);
     QGraphicsLineItem *qGraphicsLineItem1 = new QGraphicsLineItem(*line1);
@@ -91,11 +92,11 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
                           QPen(*classColor), QBrush(*classColor, Qt::SolidPattern));
     }
 
-    QString xPos = QString::number((this->lastPoint.x()- this->sceneWidth/2)/PIXEL_TO_CM);
-    QString yPos = QString::number((this->sceneHeight/2 - this->lastPoint.y())/PIXEL_TO_CM);
+    QString xPos = QString::number((this->lastPoint.x() - this->sceneWidth / 2) / PIXEL_TO_CM);
+    QString yPos = QString::number((this->sceneHeight / 2 - this->lastPoint.y()) / PIXEL_TO_CM);
     ui->labelPointCords->setText(xPos + "," + yPos);
 
-    QPointF myPoint(xPos.toDouble()* PIXEL_TO_CM, yPos.toDouble() * PIXEL_TO_CM);
+    QPointF myPoint(xPos.toDouble(), yPos.toDouble());
     QList<QPointF> pointList = this->classPoints.value(this->selectedClass);
     pointList.append(myPoint);
     this->classPoints.insert(this->selectedClass, pointList);
