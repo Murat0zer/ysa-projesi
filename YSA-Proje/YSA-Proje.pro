@@ -30,14 +30,16 @@ SOURCES += \
     myqgraphicsview.cpp \
     matrix.cpp \
     vertex.cpp \
-    classline.cpp
+    classline.cpp \
+    statistics.cpp
 
 HEADERS += \
         mainwindow.h \
     myqgraphicsview.h \
     matrix.h \
     vertex.h \
-    classline.h
+    classline.h \
+    statistics.h
 
 FORMS += \
         mainwindow.ui

@@ -286,7 +286,20 @@
      </rect>
     </property>
     <property name="text">
-     <string>0.01</string>
+     <string>0.05</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBoxNormalize">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>450</y>
+      <width>92</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Normalize</string>
     </property>
    </widget>
   </widget>

@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include "statistics.cpp"
 #include <QTime>
 
 static double PIXEL_TO_CM = 37.795276;
@@ -65,14 +65,50 @@ void MainWindow::on_pushButtonTrain_clicked()
         int delayInMs = ui->lineEditDelay->text().toInt();
         for(QString className : myQGraphicsView->getClassList()) {
             QList<QPointF> points = myQGraphicsView->getClassPoints().value(className);
+
+            QList<double> xValues;
+            QList<double> yValues;
+            for (QPointF pointQ: points) {
+                xValues.append(pointQ.x() );
+                yValues.append(pointQ.y() );
+            }
+            double maxX = *std::max_element(xValues.begin(), xValues.end());
+            double minX = *std::min_element(xValues.begin(), xValues.end());
+
+            double maxY = *std::max_element(yValues.begin(), yValues.end());
+            double minY = *std::min_element(yValues.begin(), yValues.end());
+
             for(QPointF point : points) {
 
-                xn.Set(1, 1, point.x()); xn.Set(2, 1, point.y()); xn.Set(3, 1, 1);
+                double a;
+                double b;
+                xn.Set(3, 1, 1);
+                if(ui->checkBoxNormalize->isChecked()) {
+//                    xn.Set(1, 1, (point.x() - meanX) / devinationX);
+//                    xn.Set(2, 1, (point.y() - meanY) / devinationY);
+                    xn.Set(1, 1, (point.x() - minX)/(maxX - minX));
+                    xn.Set(2, 1, (point.y() - minY)/(maxY - minY));
+
+                     a = xn.Get(1,1);
+                     b = xn.Get(2,1);
+                }
+                else {
+                    xn.Set(1, 1, point.x());
+                    xn.Set(2, 1, point.y());
+                }
 
                 transpozeW = Matrix::matrisTranspoze(weights);
                 netMatrix = Matrix::matrixMultiplication(transpozeW, xn);
                 netValue = netMatrix.Get(1, 1);
 
+                if(ui->checkBoxNormalize->isChecked()){
+//                    xn.Set(1,1, (xn.Get(1,1) + meanX) * devinationX);
+//                    xn.Set(2,1, (xn.Get(2,1) + meanY) * devinationY);
+                    xn.Set(1, 1, (point.x() + minX)*(maxX - minX));
+                    xn.Set(2, 1, (point.y() + minY)*(maxY - minY));
+                    transpozeW = Matrix::matrisTranspoze(weights);
+                    netMatrix = Matrix::matrixMultiplication(transpozeW, xn);
+                }
                 if(activationFunc == "Binary Function") {
                     outPut = netValue > 0.0 ? 1 : - 1;
                     t1 = c*(diList.value(className) - outPut);
