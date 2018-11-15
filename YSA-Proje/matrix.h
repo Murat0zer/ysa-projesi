@@ -5,31 +5,34 @@
 class Matrix
 {
 public:
-    Matrix(int, int);
+    Matrix (int, int);
 
     void Set(int, int, double) const;
 
     double Get(int, int) const;
 
-    Matrix operator / (int n);
+    Matrix  operator / (int n);
 
-    Matrix operator * (double n);
+    Matrix  operator * (double n);
 
-    Matrix operator + (const Matrix& other);
+    Matrix  operator + (const Matrix & other);
 
-    bool operator ==(const Matrix& other);
+    bool operator ==(const Matrix & other);
 
-    bool operator!=(const Matrix& other);
+    bool operator!=(const Matrix & other);
 
     // copy const.
-    Matrix(Matrix &matrix);
-    Matrix operator = ( const Matrix &other);
+    Matrix (Matrix  &matrix);
+    Matrix (Matrix *matrix);
+
+    Matrix  operator = ( const Matrix  &other);
+    Matrix  operator = ( const Matrix  *other);
 
     int getColumn() const;
     int getRow() const;
 
-    static Matrix matrixMultiplication(Matrix matrixA, Matrix matrixB);
-    static Matrix matrisTranspoze(Matrix matris);
+    static Matrix  matrixMultiplication(Matrix  matrixA, Matrix  matrixB);
+    static Matrix  matrisTranspoze(Matrix  matris);
 
 private:
     int row, col;

@@ -39,10 +39,7 @@ class MyQGraphicsView : public QGraphicsView
         QMap<QString, QList<QPointF> > getClassPoints() const;
         void setClassPoints(const QMap<QString, QList<QPointF> > &value);
 
-        void drawLine(Matrix weights);
-
-        Matrix *getWeights() const;
-        void setWeights(Matrix *value);
+        void drawLine(QMap<QString, Matrix*> *weightList);
 
         void clearLines();
         void clearPoints();
@@ -54,6 +51,9 @@ class MyQGraphicsView : public QGraphicsView
 
         QString getActivationFunc() const;
         void setActivationFunc(const QString &value);
+
+        QMap<QString, Matrix *> getWeightList() const;
+        void setWeightList(const QMap<QString, Matrix *> &value);
 
 private:
         void generateColors();
@@ -77,11 +77,13 @@ private:
             int sceneHeight;
             QMap<QString, QList<QPointF>> classPoints;
             QMap<QString, QColor> classColors;
-            Matrix *weights;
             QGraphicsEllipseItem *ellipse;
             QMap<QString, ClassLine> disctrimantFuns;
             QList<ClassLine> allLines;
             QString activationFunc;
+
+            QMap<QString, Matrix*> *weightList;
+
 
 };
 

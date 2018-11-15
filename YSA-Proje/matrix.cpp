@@ -1,6 +1,20 @@
 #include "matrix.h"
 
-Matrix::Matrix( Matrix & Matrix)
+Matrix::Matrix(Matrix *Matrix)
+{
+    row = Matrix->row;
+    col = Matrix->col;
+    p = new double*[row];
+    for (int i = 0; i < row; i++)
+    {
+        p[i] = new double[col];
+    }
+    for (int i = 1; i <= Matrix->row; i++)
+        for (int j = 1; j <= Matrix->col; j++)
+            this->Set(i, j, Matrix->Get(i, j));
+}
+
+Matrix::Matrix(Matrix &Matrix)
 {
     row = Matrix.row;
     col = Matrix.col;
@@ -26,6 +40,22 @@ Matrix Matrix::operator=(const Matrix & other)
     for (int i = 1; i <= other.row; i++)
         for (int j = 1; j <= other.col; j++)
             this->Set(i, j, other.Get(i, j));
+
+    return *this;
+}
+
+Matrix Matrix::operator =(const Matrix *other)
+{
+    row = other->row;
+    col = other->col;
+    p = new double*[row];
+    for (int i = 0; i < row; i++)
+    {
+        p[i] = new double[col];
+    }
+    for (int i = 1; i <= other->row; i++)
+        for (int j = 1; j <= other->col; j++)
+            this->Set(i, j, other->Get(i, j));
 
     return *this;
 }

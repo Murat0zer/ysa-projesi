@@ -24,12 +24,18 @@ public:
     QString getSelectedClass();
     void setSelectedClass(const QString &value);
 
+    void computeMaxMinForNormalize(QList<QPointF> points);
+    void getWeightList();
+    void updateClassList();
+    void updateDiList(QString className);
 private slots:
     void on_classSelectComboBox_currentTextChanged(const QString &arg1);
     void on_pushButtonTrain_clicked();
     void on_pushButtonClear_clicked();
 
     void on_activationFuncSelectComboBox_currentTextChanged(const QString &arg1);
+
+    void on_commandLinkButton_clicked();
 
 private:
 
@@ -40,6 +46,9 @@ private:
     QString activationFunc;
 
     QMap<QString, double> diList;
+    QMap<QString, Matrix*> *weightList;
+    double maxX, minX, maxY, minY;
+
 
 };
 
