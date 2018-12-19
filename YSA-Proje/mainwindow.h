@@ -28,6 +28,8 @@ public:
     void getWeightList();
     void updateClassList();
     void updateDiList(QString className);
+    void multiLayerTrain();
+
 private slots:
     void on_classSelectComboBox_currentTextChanged(const QString &arg1);
     void on_pushButtonTrain_clicked();

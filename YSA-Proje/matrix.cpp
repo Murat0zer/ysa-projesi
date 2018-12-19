@@ -1,5 +1,8 @@
 #include "matrix.h"
 
+#include <QPointF>
+
+
 Matrix::Matrix(Matrix *Matrix)
 {
     row = Matrix->row;

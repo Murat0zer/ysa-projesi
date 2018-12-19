@@ -55,6 +55,16 @@ class MyQGraphicsView : public QGraphicsView
         QMap<QString, Matrix *> getWeightList() const;
         void setWeightList(const QMap<QString, Matrix *> &value);
 
+        QList<Matrix *> *getAraKatmanWeights() const;
+        void setAraKatmanWeights(QList<Matrix *> *value);
+
+        Matrix *getV() const;
+        void setV(Matrix *value);
+
+        Matrix *getW() const;
+        void setW(Matrix *value);
+
+        void randomMultiLayerWeights();
 private:
         void generateColors();
         void drawOrigin();
@@ -65,6 +75,9 @@ signals:
 
 public slots:
         void mousePressEvent(QMouseEvent * e) override;
+
+private slots:
+        void on_commandLinkButton_clicked();
 
 private:
             Ui::MainWindow *ui;
@@ -83,6 +96,10 @@ private:
             QString activationFunc;
 
             QMap<QString, Matrix*> *weightList;
+            QList<Matrix*> *araKatmanWeights;
+
+            Matrix *V;
+            Matrix *W;
 
 
 };

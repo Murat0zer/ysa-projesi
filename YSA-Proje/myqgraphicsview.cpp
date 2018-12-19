@@ -8,6 +8,7 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent, Ui::MainWindow *ui) :
     this->ui = ui;
     scene = new QGraphicsScene();
     weightList = new QMap<QString, Matrix*>;
+    araKatmanWeights = new QList<Matrix*>;
     this->setSceneRect(0, 0, 900, 450);
     this->setScene(scene);
     this->drawOrigin();
@@ -21,8 +22,8 @@ void MyQGraphicsView::drawLine(QMap<QString, Matrix*> *weightList)
     for(Matrix *weight : weightList->values()) {
         double newZ;
         newZ = weight->Get(3,1);
-        double x2 =  -newZ / weight->Get(2,1) * PIXEL_TO_CM;
-        double x1 =  -newZ / weight->Get(1,1) * PIXEL_TO_CM;
+        double x2 =  -newZ / weight->Get(2,1) ;
+        double x1 =  -newZ / weight->Get(1,1) ;
 
         QLineF *line1 = new QLineF(450,  225 - x2, x1 + 450  , 225);
         QGraphicsLineItem *qGraphicsLineItem1 = new QGraphicsLineItem(*line1);
@@ -48,11 +49,43 @@ void MyQGraphicsView::drawLine(QMap<QString, Matrix*> *weightList)
     }
 }
 
+void MyQGraphicsView::randomMultiLayerWeights() {
+    int araKatmanAdet = ui->lineEditAraKatman->text().toInt();
+
+    V = new Matrix(araKatmanAdet,3);
+    W = new Matrix(this->classList.size(), V->getRow() + 1);
+
+    for (int i=1; i <= V->getRow(); i++) {
+        Matrix *weights = new Matrix(3, 1);
+        for (int j=0; j < 3; j++)
+            weights->Set(j+1, 1, QRandomGenerator::global()->generateDouble() );
+
+        this->getAraKatmanWeights()->append(weights);
+
+        V->Set(i,1, weights->Get(1, 1) );
+        V->Set(i,2, weights->Get(2, 1) );
+        V->Set(i,3, weights->Get(3, 1) );
+    }
+
+    int classindex = 1;
+    for(QString className : this->getClassList()){
+        Matrix *weights = new Matrix(W->getColumn(), 1);
+        for(int j=1; j<= W->getColumn(); j++) {
+            weights->Set(j, 1, QRandomGenerator::global()->generateDouble() );
+        }
+        weightList->insert(className, new Matrix(weights));
+        for(int j=1; j<= weights->getRow(); j++) {
+            W->Set(classindex, j, weights->Get(j, 1));
+        }
+        classindex++;
+    }
+}
+
 void MyQGraphicsView::clearLines() {
 
     for(ClassLine classLine : allLines) {
         scene->removeItem(classLine.getQGraphicsLineItem1());
-        scene->removeItem(classLine.getQGraphicsLineItem2());        
+        scene->removeItem(classLine.getQGraphicsLineItem2());
     }
     allLines.clear();
 }
@@ -81,14 +114,44 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
                           QPen(*classColor), QBrush(*classColor, Qt::SolidPattern));
     }
 
-    QString xPos = QString::number((this->lastPoint.x() - this->sceneWidth / 2) / PIXEL_TO_CM);
-    QString yPos = QString::number((this->sceneHeight / 2 - this->lastPoint.y()) / PIXEL_TO_CM);
+    QString xPos = QString::number((this->lastPoint.x() - this->sceneWidth / 2) );
+    QString yPos = QString::number((this->sceneHeight / 2 - this->lastPoint.y()) );
     ui->labelPointCords->setText(xPos + "," + yPos);
 
     QPointF myPoint(xPos.toDouble(), yPos.toDouble());
     QList<QPointF> pointList = this->classPoints.value(this->selectedClass);
     pointList.append(myPoint);
     this->classPoints.insert(this->selectedClass, pointList);
+}
+
+Matrix *MyQGraphicsView::getW() const
+{
+    return W;
+}
+
+void MyQGraphicsView::setW(Matrix *value)
+{
+    W = value;
+}
+
+Matrix *MyQGraphicsView::getV() const
+{
+    return V;
+}
+
+void MyQGraphicsView::setV(Matrix *value)
+{
+    V = value;
+}
+
+QList<Matrix *> *MyQGraphicsView::getAraKatmanWeights() const
+{
+    return araKatmanWeights;
+}
+
+void MyQGraphicsView::setAraKatmanWeights(QList<Matrix *> *value)
+{
+    araKatmanWeights = value;
 }
 
 
