@@ -33,6 +33,7 @@ public:
 
     static Matrix  matrixMultiplication(Matrix  matrixA, Matrix  matrixB);
     static Matrix  matrisTranspoze(Matrix  matris);
+    static void  print(Matrix matrix);
 
 private:
     int row, col;

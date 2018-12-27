@@ -1,7 +1,7 @@
 #include "matrix.h"
 
 #include <QPointF>
-
+#include <QDebug>
 
 Matrix::Matrix(Matrix *Matrix)
 {
@@ -72,6 +72,9 @@ Matrix::Matrix(int x, int y)
     {
         p[i] = new double[y];
     }
+    for (int i = 0; i < this->getRow(); i++)
+        for(int j=0; j< this->getColumn(); j++)
+            this->Set(i+1, j+1, 0.000);
 }
 void Matrix::Set(int a, int b, double d) const
 {
@@ -122,6 +125,13 @@ Matrix Matrix::matrisTranspoze(Matrix matris)
 
     return transpozeMatris;
 
+}
+
+void Matrix::print(Matrix matrix)
+{
+    for(int i=1; i<=matrix.getRow(); i++)
+        for (int j = 1; j <= matrix.getColumn(); j++)
+         qDebug() << QString::number(i) + "-" + QString::number(j)  << matrix.Get(i,j);
 }
 int Matrix::getColumn() const
 {

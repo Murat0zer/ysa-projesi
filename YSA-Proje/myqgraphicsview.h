@@ -12,6 +12,8 @@
 #include "vertex.h"
 #include "matrix.h"
 #include "classline.h"
+#include <QtMath>
+
 
 class MyQGraphicsView : public QGraphicsView
 {
@@ -65,6 +67,10 @@ class MyQGraphicsView : public QGraphicsView
         void setW(Matrix *value);
 
         void randomMultiLayerWeights();
+
+        void normalize(QList<QPointF *> points, QPointF *mean, QPointF *standartDeviation);
+
+        void testNetwork(Matrix W, Matrix V, QPointF *mean, QPointF *standartDeviation);
 private:
         void generateColors();
         void drawOrigin();
@@ -100,6 +106,8 @@ private:
 
             Matrix *V;
             Matrix *W;
+
+            QList<QGraphicsEllipseItem*> *testPointGraphicItemList;
 
 
 };

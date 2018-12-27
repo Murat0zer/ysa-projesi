@@ -30,6 +30,10 @@ public:
     void updateDiList(QString className);
     void multiLayerTrain();
 
+    void normalize(QList<QPointF *> points, QPointF *mean, QPointF *standartDeviation);
+    double getError() const;
+    void setError(double value);
+
 private slots:
     void on_classSelectComboBox_currentTextChanged(const QString &arg1);
     void on_pushButtonTrain_clicked();
@@ -50,6 +54,7 @@ private:
     QMap<QString, double> diList;
     QMap<QString, Matrix*> *weightList;
     double maxX, minX, maxY, minY;
+    double error = 0;
 
 
 };

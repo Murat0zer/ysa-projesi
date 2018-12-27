@@ -1,6 +1,5 @@
 #include "myqgraphicsview.h"
 
-static double PIXEL_TO_CM = 37.795276;
 
 MyQGraphicsView::MyQGraphicsView(QWidget *parent, Ui::MainWindow *ui) :
     QGraphicsView(parent)
@@ -12,6 +11,7 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent, Ui::MainWindow *ui) :
     this->setSceneRect(0, 0, 900, 450);
     this->setScene(scene);
     this->drawOrigin();
+    testPointGraphicItemList = new QList<QGraphicsEllipseItem*>;
 
 }
 
@@ -57,28 +57,148 @@ void MyQGraphicsView::randomMultiLayerWeights() {
 
     for (int i=1; i <= V->getRow(); i++) {
         Matrix *weights = new Matrix(3, 1);
-        for (int j=0; j < 3; j++)
+        for (int j=0; j < 2; j++)
             weights->Set(j+1, 1, QRandomGenerator::global()->generateDouble() );
+
+        weights->Set(3, 1, 3);
 
         this->getAraKatmanWeights()->append(weights);
 
         V->Set(i,1, weights->Get(1, 1) );
         V->Set(i,2, weights->Get(2, 1) );
         V->Set(i,3, weights->Get(3, 1) );
+
+        delete weights;
     }
 
     int classindex = 1;
     for(QString className : this->getClassList()){
         Matrix *weights = new Matrix(W->getColumn(), 1);
-        for(int j=1; j<= W->getColumn(); j++) {
+        for(int j=1; j<= W->getColumn()-1; j++) {
             weights->Set(j, 1, QRandomGenerator::global()->generateDouble() );
         }
+
+        weights->Set(3, 1, 3 );
+
         weightList->insert(className, new Matrix(weights));
         for(int j=1; j<= weights->getRow(); j++) {
             W->Set(classindex, j, weights->Get(j, 1));
         }
         classindex++;
+        delete weights;
     }
+}
+
+void MyQGraphicsView::testNetwork(Matrix W, Matrix V, QPointF *mean, QPointF *standartDeviation)
+{
+    for(QGraphicsEllipseItem *item : *testPointGraphicItemList) {
+        scene->removeItem(item);
+        testPointGraphicItemList->removeOne(item);
+        delete item;
+    }
+
+    int incSize = 4;
+    QList<QPointF*> *testPoints = new QList<QPointF*>;
+    for(int i=0; i< 900; i+=incSize)
+        for(int j=0; j< 450; j+=incSize) {
+            QPointF *testPoint = new QPointF(i- 450, j- 225 );
+            testPoints->append(testPoint);
+        }
+
+    //this->normalize(*testPoints, mean, standartDeviation);
+
+    int i = 0; int j = 0;
+    for(QPointF *point : *testPoints) {
+        Matrix * normalizedInput = new Matrix(3, 1);
+        normalizedInput->Set(1, 1, (point->rx() - mean->rx())/ standartDeviation->rx());
+        normalizedInput->Set(2, 1, (point->ry() - mean->ry())/ standartDeviation->ry());
+        //        normalizedInput->Set(2, 1, (point->ry()));
+        //        normalizedInput->Set(1, 1, (point->rx()));
+        normalizedInput->Set(3, 1, -1.0);
+
+        Matrix netJ(V.getRow(), normalizedInput->getColumn());
+        Matrix fNetJ(V.getRow(), normalizedInput->getColumn());
+        Matrix y(fNetJ.getRow() + 1, fNetJ.getColumn());
+        Matrix netK(W.getRow(), y.getColumn());
+        Matrix fNetZ(W.getRow(), y.getColumn());
+
+        netJ = Matrix::matrixMultiplication(V, *normalizedInput);
+        for(int i=0; i<netJ.getRow(); i++){
+            //double fNet = (2.0/(1.0 + qExp(-netJ.Get(i+1, 1) * 1))) - 1.0;
+            double fNet = tanh(netJ.Get(i+1, 1));
+            fNetJ.Set(i+1, 1, fNet);
+        }
+
+        y = new Matrix(fNetJ.getRow() + 1, fNetJ.getColumn());
+        for(int l = 0; l< fNetJ.getRow(); l++)
+            for(int n = 0; n<fNetJ.getColumn(); n++)
+                y.Set(l+1, n+1, fNetJ.Get(l+1,n+1));
+        y.Set(y.getRow(), y.getColumn(), -1.0);
+        netK = Matrix::matrixMultiplication(W, y);
+
+        for(int k=0; k< netK.getRow(); k++){
+            //double fNet = (2.0/(1.0 + qExp(-netK.Get(k+1, 1) * 1))) - 1.0;
+            double fNet = tanh(netK.Get(k+1, 1));
+            fNetZ.Set(k+1, 1, fNet);
+        }
+
+
+        double max = 0;
+        int classIndex = 0;
+        for(int k =0; k < fNetZ.getRow(); k++) {
+            if((fNetZ.Get(k + 1, 1)) > (max)) {
+                max = fNetZ.Get(k + 1, 1);
+                classIndex = k;
+            }
+        }
+
+        this->setSelectedClass("Class " + QString::number(classIndex +  1));
+
+        QColor classColor = QColor(classColors.value(this->selectedClass));
+        QGraphicsEllipseItem *qGrapEllipseItem = new QGraphicsEllipseItem(i, j , 0.1, 0.1);
+        QPen qPen = QPen(classColor);
+        QBrush qBrush = QBrush(classColor, Qt::SolidPattern);
+        qGrapEllipseItem->setPen(qPen);
+        qGrapEllipseItem->setBrush(qBrush);
+        scene->addItem(qGrapEllipseItem);
+        testPointGraphicItemList->append(qGrapEllipseItem);
+
+        j+=incSize;
+        if(! (j < this->sceneHeight) ) {
+            i+=incSize;
+            j = 0;
+        }
+        delete normalizedInput;
+    }
+    for(QPointF *point : *testPoints)
+        delete  point;
+
+}
+
+void MyQGraphicsView::normalize(QList<QPointF *> points, QPointF *mean, QPointF *standartDeviation)
+{
+    double meanX = 0;
+    double meanY = 0;
+    double sumX = 0;
+    double sumY = 0;
+    for(QPointF *point : points){
+        sumX += point->rx();
+        sumY += point->ry();
+    }
+    meanX = sumX / points.size();
+    meanY = sumY / points.size();
+    QPointF meanPoint;
+    meanPoint.setX(meanX); meanPoint.setY(meanY);
+    QPointF variance(0,0);
+
+    for(QPointF *point : points){
+        variance.setX(variance.rx() + pow(point->rx() - meanPoint.rx(), 2));
+        variance.setY(variance.ry() + pow(point->ry() - meanPoint.ry(), 2));
+    }
+    standartDeviation->setX(sqrt(variance.rx()));
+    standartDeviation->setY(sqrt(variance.ry()));
+    mean->setX(meanX);
+    mean->setY(meanY);
 }
 
 void MyQGraphicsView::clearLines() {
